@@ -15,6 +15,11 @@ namespace SafeGate.Controllers
 
         public IActionResult Index()
         {
+            ViewData["Username"] = HttpContext.Session.GetString("Username");
+            ViewData["Nome"] = HttpContext.Session.GetString("Nome");
+            ViewData["Cognome"] = HttpContext.Session.GetString("Cognome");
+            ViewData["Ruolo"] = HttpContext.Session.GetString("Ruolo");
+            ViewData["Id_Funzionario"] = HttpContext.Session.GetString("Id_Funzionario");
             return View();
         }
 

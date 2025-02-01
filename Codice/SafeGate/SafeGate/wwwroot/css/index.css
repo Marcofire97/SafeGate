@@ -1,0 +1,126 @@
+﻿body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7fa;
+    overflow-x: hidden;
+}
+
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 250px;
+    background-color: #343a40;
+    color: white;
+    box-shadow: 4px 0 6px rgba(0, 0, 0, 0.1);
+    transition: width 0.3s ease, opacity 0.3s ease;
+}
+
+    #sidebar.closed {
+        width: 80px;
+    }
+
+    #sidebar .sidebar-item {
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        transition: background-color 0.2s;
+        cursor: pointer;
+    }
+
+        #sidebar .sidebar-item:hover {
+            background-color: #495057;
+        }
+
+        #sidebar .sidebar-item i {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        #sidebar .sidebar-item span {
+            margin-left: 10px;
+            font-size: 1rem;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+    #sidebar.closed .sidebar-item span {
+        opacity: 0;
+    }
+
+.sidebar-toggle-btn {
+    position: absolute;
+    top: 20px;
+    right: -40px;
+    background-color: #343a40;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+    .sidebar-toggle-btn:hover {
+        background-color: #495057;
+    }
+
+.container {
+    display: flex;
+    justify-content: center;
+    padding: 30px;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.content {
+    width: 70%;
+    max-width: 900px;
+    text-align: center;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+.content-expanded {
+    margin-left: 170px;
+}
+
+
+#main-content {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.fade-out {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+.fade-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#current-time, #current-day {
+    font-size: 1.5em;
+    color: #333;
+    font-weight: 500;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+#current-time {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #007bff;
+}
+
+#current-day {
+    color: #6c757d;
+    font-style: italic;
+}
+
+

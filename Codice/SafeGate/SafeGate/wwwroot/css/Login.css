@@ -1,129 +1,123 @@
-﻿body {
-    background-image: url('https://media.cntraveler.com/photos/5f6125da978ff785b2501551/16:9/w_2560%2Cc_limit/TSA-GettyImages-182440070.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+﻿/* Reset di base */
+* {
     margin: 0;
-}
-
-
-.form_main {
-    width: 280px;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: rgb(255, 255, 255);
-    padding: 30px 30px 30px 30px;
-    border-radius: 30px;
-    box-shadow: 0px 0px 40px rgba(0, 0, 0, 0.062);
-    margin: 0 auto;
-}
-
-.heading {
-    font-size: 2.5em;
-    color: #2e2e2e;
-    font-weight: 700;
-    margin: 15px 0 30px 0;
-}
-
-.inputContainer {
-    width: 100%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.inputIcon {
-    position: absolute;
-    left: 10px;
-}
-
-.inputField {
-    width: 100%;
-    height: 40px;
-    background-color: transparent;
-    border: none;
-    border-bottom: 2px solid rgb(173, 173, 173);
-    border-radius: 30px;
-    margin: 10px 0;
-    color: black;
-    font-size: .8em;
-    font-weight: 500;
+    padding: 0;
     box-sizing: border-box;
-    padding-left: 30px;
 }
 
-    .inputField:focus {
-        outline: none;
-        border-bottom: 2px solid rgb(199, 114, 255);
-    }
-
-    .inputField::placeholder {
-        color: rgb(80, 80, 80);
-        font-size: 1em;
-        font-weight: 500;
-    }
-
-#button {
-    position: relative;
-    width: 100%;
-    border: 2px solid #8000ff;
-    background-color: #8000ff;
-    height: 40px;
-    color: white;
-    font-size: .8em;
-    font-weight: 500;
-    letter-spacing: 1px;
-    border-radius: 30px;
-    margin: 10px;
-    cursor: pointer;
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #000;
     overflow: hidden;
 }
 
-    #button::after {
-        content: "";
-        position: absolute;
-        background-color: rgba(255, 255, 255, 0.253);
-        height: 100%;
-        width: 150px;
-        top: 0;
-        left: -200px;
-        border-bottom-right-radius: 100px;
-        border-top-left-radius: 100px;
-        filter: blur(10px);
-        transition-duration: .5s;
-    }
-
-    #button:hover::after {
-        transform: translateX(600px);
-        transition-duration: .5s;
-    }
-
-.signupContainer {
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
+.background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('https://media.cntraveler.com/photos/5f6125da978ff785b2501551/16:9/w_2560%2Cc_limit/TSA-GettyImages-182440070.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.5;
+    z-index: -1;
 }
 
-    .signupContainer p {
-        font-size: .9em;
-        font-weight: 500;
-        color: black;
+.login-container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+.logo img {
+    width: 150px;
+    margin-bottom: 1.5rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    color: #333;
+}
+
+.input-group {
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+    .input-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #555;
     }
 
-    .signupContainer a {
-        font-size: .7em;
-        font-weight: 500;
-        background-color: #2e2e2e;
-        color: white;
-        text-decoration: none;
-        padding: 8px 15px;
-        border-radius: 20px;
+.input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+    .input-icon-wrapper input {
+        width: 100%;
+        padding: 0.75rem;
+        padding-right: 40px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1rem;
     }
+
+    .input-icon-wrapper .toggle-password {
+        position: absolute;
+        right: 10px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #777;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .input-icon-wrapper .toggle-password:hover {
+            color: #333;
+        }
+
+button[type="submit"] {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+
+.forgot-password {
+    margin-top: 1rem;
+}
+
+    .forgot-password a {
+        color: #007bff;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
