@@ -1,0 +1,163 @@
+﻿<style>
+    .home-container {
+        text-align: center;
+        padding: 30px;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    #current-time {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    #current-day {
+        font-style: italic;
+        color: #666;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        justify-content: center;
+        max-width: 900px;
+        margin: auto;
+    }
+
+    .stat-box {
+        background: linear-gradient(135deg, #007bff, #00c6ff);
+        color: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);
+        text-align: center;
+        min-width: 220px;
+        min-height: 160px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-box i {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-box h3 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .stat-box p {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<div class="home-container">
+    <h1 id="welcome-text"></h1>
+    <p id="current-time"></p>
+    <p id="current-day"></p>
+
+    <div class="stats-container">
+        <div class="stat-box">
+            <i class="fas fa-clipboard-check"></i>
+            <h3 id="num-controlli">0</h3>
+            <p>Controlli Effettuati</p>
+        </div>
+        <div class="stat-box">
+            <i class="fas fa-user-check"></i>
+            <h3 id="num-passeggeri">0</h3>
+            <p>Passeggeri Controllati</p>
+        </div>
+        <div class="stat-box">
+            <i class="fas fa-box-open"></i>
+            <h3 id="num-merci-respinte">0</h3>
+            <p>Merci Respinte/Sequestrate</p>
+        </div>
+        <div class="stat-box">
+            <i class="fas fa-euro-sign"></i>
+            <h3 id="tot-dazi">0</h3>
+            <p>Dazi Doganali Riscossi</p>
+        </div>
+        <div class="stat-box">
+            <i class="fas fa-archive"></i>
+            <h3 id="num-merci-dichiarate">0</h3>
+            <p>Merci Dichiarate</p>
+        </div>
+        <div class="stat-box">
+            <i class="fas fa-tags"></i>
+            <h3 id="num-punti-controllo">0</h3>
+            <p>Punti di controllo</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        if (typeof viewData !== "undefined") {
+            $("#welcome-text").text(`Bentornato ${viewData.Nome} ${viewData.Cognome}`);
+        }
+
+        function updateDateTime() {
+            let now = new Date();
+            let timeString = now.toLocaleTimeString("it-IT", { hour: '2-digit', minute: '2-digit' });
+            let dayString = now.toLocaleDateString("it-IT", { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+            $("#current-time").text(`Ora attuale: ${timeString}`);
+            $("#current-day").text(`Oggi è: ${dayString}`);
+        }
+
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+
+        function fetchStats() {
+            $(".stat-box h3").addClass("loading");
+            console.log("Fetching statistics...");
+            $.ajax({
+                url: "/Home/GetStatistics",
+                type: "GET",
+                success: function(data) {
+                    console.log("Dati ricevuti:", data);
+                    $("#num-controlli").text(data.numero_Controlli_Totali);
+                    $("#num-passeggeri").text(data.numero_Passeggeri_Controllati);
+                    $("#num-merci-respinte").text(data.merci_Respinte_Sequestrate);
+                    $("#tot-dazi").text("€" + parseFloat(data.totale_Dazi_Riscossi).toFixed(2));
+                    $("#num-merci-dichiarate").text(data.merci_Dichiarate);
+                    $("#num-punti-controllo").text(data.numero_Punti_Controllo);
+
+                    $(".stat-box h3").removeClass("loading");
+                },
+                error: function() {
+                    console.error("Errore nel caricamento delle statistiche.");
+                    $(".stat-box h3").text("—");
+                    $(".stat-box h3").removeClass("loading");
+                }
+            });
+        }
+
+        fetchStats();
+        setInterval(fetchStats, 5000);
+    });
+</script>

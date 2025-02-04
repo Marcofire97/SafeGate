@@ -13,38 +13,39 @@
 </head>
 <body>
     <div id="sidebar" class="closed">
-        <button class="sidebar-toggle-btn" onclick="toggleSidebar()">
+        <button class="sidebar-toggle-btn">
             <i class="bi bi-chevron-left"></i>
         </button>
-        <a href="#" class="sidebar-item" onclick="loadSection('home')">
+        <a href="#" class="sidebar-item" section="home">
             <i class="bi bi-house-door"></i>
             <span class="section-name">Home</span>
         </a>
-        <a href="#" class="sidebar-item" onclick="loadSection('about')">
+        <a href="#" class="sidebar-item" section="about">
             <i class="bi bi-info-circle"></i>
             <span class="section-name">About</span>
         </a>
-        <a href="#" class="sidebar-item" onclick="loadSection('flights')">
+        <a href="#" class="sidebar-item" section="flight">
             <i class="bi bi-airplane-engines"></i>
             <span class="section-name">Flights</span>
         </a>
-        <a href="#" class="sidebar-item" onclick="loadSection('contact')">
+        <a href="#" class="sidebar-item" section="contact">
             <i class="bi bi-phone"></i>
             <span class="section-name">Contact</span>
         </a>
+
     </div>
 
     <div class="container">
         <div class="content" id="content">
-            <h1>Bentornato @ViewData["Nome"] @ViewData["Cognome"]</h1>
-            <p id="current-time"></p>
-            <p id="current-day"></p>
+            <!-- Contenuto caricato -->
         </div>
     </div>
 
 
 
     <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+    <script>
+        var viewData = @Html.Raw(Json.Serialize(ViewData));
+    </script>
     <script src="~/js/index.js"></script>
 </body>
-</html>
