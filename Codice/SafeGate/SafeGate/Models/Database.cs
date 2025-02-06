@@ -274,6 +274,73 @@ namespace SafeGate.Models
             return result > 0;
         }
 
+        public List<Passeggero> GetPassengers()
+        {
+            const string query = @"SELECT * FROM Passeggero";
 
+
+            using var db = CreateConnection();
+            var result = db.Query<Passeggero>(query).ToList();
+            return result;
+        }
+
+        public List<Passeggero> GetPassengersArrest()
+        {
+            const string query = @"SELECT *
+                FROM 
+                Passeggero P
+                JOIN 
+                Controllo C ON P.Id_Passeggero = C.Id_Passeggero
+                JOIN 
+                Esito E ON C.Id_Controllo = E.Id_Controllo
+                WHERE 
+                E.Descrizione = 'Fermo' AND YEAR(C.Data_Ora_Fine) = YEAR(GETDATE())
+                ORDER BY 
+                P.Nazionalità, P.Nome, P.Cognome;";
+
+
+            using var db = CreateConnection();
+            var result = db.Query<Passeggero>(query).ToList();
+            return result;
+        }
+
+        public int InsertPassenger(string nome, string cognome, string nazionalità, string tipo_identificativo, string numero_identificativo, string aeroporto_partenza, string aeroporto_arrivo, string motivo_viaggio)
+        {
+            const string query = @"
+                INSERT INTO Passeggero (Nome, Cognome, Nazionalità, Tipo_Identificativo, N_Identificativo, A_Partenza, A_Destinazione, Motivo_Viaggio) 
+                VALUES (@nome, @cognome, @nazionalità, @tipo_identificativo, @numero_identificativo, @a_partenza, @a_destinazione, @motivo_viaggio); 
+                SELECT SCOPE_IDENTITY();";
+
+            using var db = CreateConnection();
+            var id = db.ExecuteScalar<int>(query, new
+            {
+                nome = nome,
+                cognome = cognome,
+                nazionalità = nazionalità,
+                tipo_identificativo = tipo_identificativo,
+                numero_identificativo = numero_identificativo,
+                a_partenza = aeroporto_partenza,
+                a_destinazione = aeroporto_arrivo,
+                motivo_viaggio = motivo_viaggio
+            });
+
+            return id;
+        }
+
+        public bool UpdatePassenger(int id, string campo, string nuovovalore)
+        {
+            using var db = CreateConnection();
+            string query = $"UPDATE Passeggero SET {campo} = @nuovovalore WHERE Id_Passeggero = @id";
+            var result = db.Execute(query, new { nuovovalore, id });
+            return result > 0;
+        }
+        public List<Controllo> GetControls()
+        {
+            const string query = @"SELECT * FROM Controllo";
+
+            using var db = CreateConnection();
+            var result = db.Query<Controllo>(query).ToList();
+            return result;
+        }
     }
 }

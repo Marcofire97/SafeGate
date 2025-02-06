@@ -21,6 +21,7 @@
 
     // Gestisce le chiamate ajax per caricare una nuova sezione a destra della barra laterale
     function loadSection(section) {
+
         var contentDiv = $('#content');
 
         contentDiv.addClass('fade-out');

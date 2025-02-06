@@ -3,6 +3,7 @@
 <!-- Pulsante per aggiungere un nuovo passeggero -->
 <div class="text-center mb-4">
     <button class="btn btn-primary" id="openAddPassengerModalBtn">Aggiungi Passeggero</button>
+    <button class="btn btn-secondary" id="openStoppedPassengersModalBtn">Passeggeri in fermo</button>
 </div>
 
 <!-- Tabella dei Passeggero -->
@@ -22,6 +23,41 @@
     </thead>
     <tbody></tbody>
 </table>
+
+<!-- Modal per mostrare i passeggeri in stato di fermo -->
+<div class="modal fade" id="stoppedPassengersModal" tabindex="-1" role="dialog" aria-labelledby="stoppedPassengersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="stoppedPassengersModalLabel">Passeggeri in fermo</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table id="StoppedPassengersTable" class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nome</th>
+                            <th>Cognome</th>
+                            <th>Nazionalità</th>
+                            <th>Tipo identificativo</th>
+                            <th>Numero identificativo</th>
+                            <th>Aeroporto partenza</th>
+                            <th>Aeroporto arrivo</th>
+                            <th>Motivo viaggio</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Modal per aggiungere un nuovo Passeggero -->
 <div class="modal fade" id="addPassengerModal" tabindex="-1" role="dialog" aria-labelledby="addPassengerModalLabel" aria-hidden="true">
@@ -88,7 +124,8 @@
     }
 
     .modal-dialog {
-        max-width: none;
+        max-width: 80vw;
+        width: 60vw;
         margin: auto;
         overflow-y: visible;
         overflow: visible;
@@ -106,7 +143,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-    $(document).ready(function () {
+        $(document).ready(function () {
         // Funzione per caricare il DataTable
         function loadDataTableScript(callback) {
             var script = document.createElement('script');
@@ -115,7 +152,7 @@
             document.head.appendChild(script);
         }
 
-        // Carica DataTables e inizializza la tabella
+        // Carica DataTables e inizializza la tabella principale
         var dataTable;
         loadDataTableScript(function() {
             $.ajax({
@@ -128,7 +165,7 @@
 
                         dataTable = $('#PassengerTable').DataTable({
                             "paging": true,
-                            "searching": true,
+                            "searching": false,
                             "info": true,
                             "ordering": true,
                             "data": response.data,
@@ -142,12 +179,6 @@
                                 { "data": "a_Partenza" },
                                 { "data": "a_Destinazione" },
                                 { "data": "motivo_Viaggio" },
-                                {
-                                    "data": "id_Passeggero",
-                                    "render": function(data, type, row) {
-                                        return '<button class="btn btn-danger btn-sm stop-btn" data-id="' + data + '">🛑</button>';
-                                    }
-                                }
                             ],
                         });
 
@@ -200,30 +231,6 @@
                                 });
                             }
                         });
-
-                        // Gestione del click sul pulsante di eliminazione
-                        $('#PassengerTable').on('click', '.delete-btn', function() {
-                            var PassengerId = $(this).data('id');
-                            var confirmation = confirm("Sei sicuro di voler eliminare questo Passeggero?");
-                            if (confirmation) {
-                                $.ajax({
-                                    url: "/Home/DeletePassenger",
-                                    type: "POST",
-                                    data: { id: PassengerId },
-                                    success: function(response) {
-                                        if (response.success) {
-                                            alert("Passeggero eliminato con successo!");
-                                            window.location.href = '/Home/Index';
-                                        } else {
-                                            alert("Errore durante l'eliminazione del Passeggero.");
-                                        }
-                                    },
-                                    error: function() {
-                                        alert("Errore nella richiesta AJAX.");
-                                    }
-                                });
-                            }
-                        });
                     } else {
                         console.error("Errore nel caricamento dei dati:", response.message || 'Dati non validi');
                     }
@@ -235,56 +242,100 @@
         });
 
         // Gestione dell'inserimento di un nuovo Passeggero
-           $('#savePassengerBtn').click(function() {
-        var nome = $('#nome').val();
-        var cognome = $('#cognome').val();
-        var nazionalità = $('#nazionalità').val();
-        var tipo_identificativo = $('#tipo_identificativo').val();
-        var numero_identificativo = $('#numero_identificativo').val();
-        var aeroporto_partenza = $('#aeroporto_partenza').val();
-        var aeroporto_arrivo = $('#aeroporto_arrivo').val();
-        var motivo_viaggio = $('#motivo_viaggio').val();
+        $('#savePassengerBtn').click(function() {
+            var nome = $('#nome').val();
+            var cognome = $('#cognome').val();
+            var nazionalità = $('#nazionalità').val();
+            var tipo_identificativo = $('#tipo_identificativo').val();
+            var numero_identificativo = $('#numero_identificativo').val();
+            var aeroporto_partenza = $('#aeroporto_partenza').val();
+            var aeroporto_arrivo = $('#aeroporto_arrivo').val();
+            var motivo_viaggio = $('#motivo_viaggio').val();
 
-        if (nome && cognome && nazionalità && tipo_identificativo && numero_identificativo && aeroporto_partenza && aeroporto_arrivo && motivo_viaggio) {
-            $.ajax({
-                url: "/Home/InsertPassenger",
-                type: "POST",
-                data: {
-                    nome: nome,
-                    cognome: cognome,
-                    nazionalità: nazionalità,
-                    tipo_identificativo: tipo_identificativo,
-                    numero_identificativo: numero_identificativo,
-                    aeroporto_partenza: aeroporto_partenza,
-                    aeroporto_arrivo: aeroporto_arrivo,
-                    motivo_viaggio: motivo_viaggio
-                },
-                success: function(response) {
-                    if (response.success) {
-                        alert("Passeggero aggiunto con successo!");
-                        window.location.href = '/Home/Index';
-                    } else {
-                        alert("Errore durante l'aggiunta del Passeggero.");
+            if (nome && cognome && nazionalità && tipo_identificativo && numero_identificativo && aeroporto_partenza && aeroporto_arrivo && motivo_viaggio) {
+                $.ajax({
+                    url: "/Home/InsertPassenger",
+                    type: "POST",
+                    data: {
+                        nome: nome,
+                        cognome: cognome,
+                        nazionalità: nazionalità,
+                        tipo_identificativo: tipo_identificativo,
+                        numero_identificativo: numero_identificativo,
+                        aeroporto_partenza: aeroporto_partenza,
+                        aeroporto_arrivo: aeroporto_arrivo,
+                        motivo_viaggio: motivo_viaggio
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert("Passeggero aggiunto con successo!");
+                            window.location.href = '/Home/Index';
+                        } else {
+                            alert("Errore durante l'aggiunta del Passeggero.");
+                        }
+                    },
+                    error: function() {
+                        alert("Errore nella richiesta AJAX.");
                     }
-                },
-                error: function() {
-                    alert("Errore nella richiesta AJAX.");
-                }
-            });
-        } else {
-            alert("Per favore, completa tutti i campi.");
-        }
-    });
+                });
+            } else {
+                alert("Per favore, completa tutti i campi.");
+            }
+        });
 
         $('#openAddPassengerModalBtn').click(function () {
             var myModal = new bootstrap.Modal(document.getElementById('addPassengerModal'));
             myModal.show();
         });
 
+        var giacaricati = false
+        // Gestione del pulsante "Passeggeri in fermo"
+        $('#openStoppedPassengersModalBtn').click(function () {
+            var myModal = new bootstrap.Modal(document.getElementById('stoppedPassengersModal'));
+            myModal.show();
+
+            $.ajax({
+                url: "/Home/GetPassengersArrest",
+                type: "GET",
+                dataType: "json",
+                success: function (response) {
+                    if (response.success && response.data && Array.isArray(response.data) && response.data.length > 0 && giacaricati == false) {
+                        giacaricati = true;
+                        console.log("Dati ricevuti:", response.data);
+
+                        $('#StoppedPassengersTable').DataTable({
+                            "paging": true,
+                            "searching": false,
+                            "info": true,
+                            "ordering": true,
+                            "pageLength": 5,
+                            "bLengthChange": false,
+                            "data": response.data,
+                            "columns": [
+                                { "data": "id_Passeggero" },
+                                { "data": "nome" },
+                                { "data": "cognome" },
+                                { "data": "nazionalità" },
+                                { "data": "tipo_Identificativo" },
+                                { "data": "n_Identificativo" },
+                                { "data": "a_Partenza" },
+                                { "data": "a_Destinazione" },
+                                { "data": "motivo_Viaggio" },
+                            ],
+                        });
+                    } else {
+                        console.error("Errore nel caricamento dei dati:", response.message || 'Dati non validi');
+                    }
+                },
+                error: function () {
+                    console.log("Errore nella richiesta AJAX.");
+                }
+            });
+        });
+
         function formatDate(dateString) {
             var date = new Date(dateString);
             return date.toLocaleString();
         }
-
-    });
+});
 </script>

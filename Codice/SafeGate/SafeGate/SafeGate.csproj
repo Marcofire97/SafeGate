@@ -16,4 +16,11 @@
     <PackageReference Include="System.Security.Permissions" Version="9.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Views\Home\Sections\Controllo.cshtml">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

@@ -175,5 +175,39 @@ namespace SafeGate.Controllers
             return Json(new { success = success });
         }
 
+        public JsonResult GetPassengers()
+        {
+            Database db = new Database();
+            var passengers = db.GetPassengers();
+            return Json(new { success = true, data = passengers });
+        }
+
+        public JsonResult GetPassengersArrest()
+        {
+            Database db = new Database();
+            var passengers = db.GetPassengersArrest();
+            return Json(new { success = true, data = passengers });
+        }
+
+        public JsonResult InsertPassenger(string nome, string cognome, string nazionalità, string tipo_identificativo, string numero_identificativo, string aeroporto_partenza, string aeroporto_arrivo, string motivo_viaggio)
+        {
+            Database db = new Database();
+            int id = db.InsertPassenger(nome, cognome, nazionalità, tipo_identificativo, numero_identificativo, aeroporto_partenza, aeroporto_arrivo, motivo_viaggio);
+            return Json(new { success = true, id = id });
+        }
+
+        [HttpPost]
+        public JsonResult UpdatePassenger(int id, string campo, string nuovovalore)
+        {
+            Database db = new Database();
+            bool success = db.UpdatePassenger(id, campo, nuovovalore);
+            return Json(new { success = success });
+        }
+        public JsonResult GetControls()
+        {
+            Database db = new Database();
+            var controls = db.GetControls();
+            return Json(new { success = true, data = controls });
+        }
     }
 }
