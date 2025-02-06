@@ -9,5 +9,6 @@
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public string Ruolo { get; set; } = string.Empty;
+        public string In_Servizio { get; set; } = string.Empty;
     }
 }

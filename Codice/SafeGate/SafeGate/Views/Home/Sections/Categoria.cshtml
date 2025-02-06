@@ -1,0 +1,205 @@
+﻿<h2 class="text-center mb-4">Elenco Categorie</h2>
+
+<!-- Pulsante per aggiungere una nuova categoria -->
+<div class="text-center mb-4">
+    <button class="btn btn-primary" id="openAddCategoryModalBtn">Aggiungi Categoria</button>
+</div>
+
+<!-- Tabella delle categorie -->
+<table id="CategoryTable" class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Descrizione</th>
+            <th>Merci respinte</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- Modal per aggiungere una nuova categoria -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryModalLabel">Aggiungi Categoria</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addCategoryForm">
+                    <div class="form-group">
+                        <label for="nome">Nome</label>
+                        <input type="text" class="form-control" id="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="descrizione">Descrizione</label>
+                        <input type="text" class="form-control" id="descrizione" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="button" class="btn btn-primary" id="saveCategoryBtn">Salva</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<style>
+    .modal-backdrop {
+        display: contents !important;
+    }
+
+    .modal {
+        overflow-y: visible;
+        overflow: visible;
+    }
+
+    .modal-dialog {
+        max-width: none;
+        margin: auto;
+        overflow-y: visible;
+        overflow: visible;
+    }
+
+    .modal-body {
+        max-height: none;
+        overflow-y: visible;
+        overflow: visible;
+    }
+</style>
+
+<script>
+    $(document).ready(function () {
+        // Funzione per caricare il DataTable
+        function loadDataTableScript(callback) {
+            var script = document.createElement('script');
+            script.src = "https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js";
+            script.onload = callback;
+            document.head.appendChild(script);
+        }
+
+        // Carica DataTables e inizializza la tabella
+        var dataTable;
+        loadDataTableScript(function() {
+            $.ajax({
+                url: "/Home/GetCategories",
+                type: "GET",
+                dataType: "json",
+                success: function (response) {
+                    if (response.success && response.data && Array.isArray(response.data) && response.data.length > 0) {
+                        console.log("Dati ricevuti:", response.data);
+
+                        dataTable = $('#CategoryTable').DataTable({
+                            "paging": true,
+                            "searching": false,
+                            "info": true,
+                            "ordering": true,
+                            "data": response.data,
+                            "columns": [
+                                { "data": "id_Categoria" },
+                                { "data": "nome" },
+                                { "data": "descrizione" },
+                                { "data": "merci_Respinte" },
+                            ],
+                        });
+
+                        // Gestione delle celle per modificare i valori
+                        $('#CategoryTable').on('click', 'td', function () {
+                            var cell = dataTable.cell(this);
+                            var columnIndex = cell.index().column;
+
+                            if (columnIndex === 0 || columnIndex === 3 || columnIndex === 4) {
+                                return;
+                            }
+
+                            var currentValue = cell.data();
+                            var newValue = prompt("Modifica il valore:", currentValue);
+
+                            if (newValue !== null && newValue !== currentValue) {
+                                cell.data(newValue).draw();
+
+                                var rowData = dataTable.row(cell.index().row).data();
+                                var updatedField = columnIndex === 1 ? 'Nome' :
+                                                   columnIndex === 2 ? 'Descrizione' : '';
+
+                                // Aggiornamento della categoria
+                                $.ajax({
+                                    url: "/Home/UpdateCategory",
+                                    type: "POST",
+                                    data: {
+                                        id: rowData.id_Categoria,
+                                        campo: updatedField,
+                                        nuovovalore: newValue
+                                    },
+                                    success: function (response) {
+                                        if (response.success) {
+                                            alert("Categoria aggiornato con successo.");
+                                        } else {
+                                            alert("Errore durante l'aggiornamento dellla categoria.");
+                                            cell.data(currentValue).draw();
+                                        }
+                                    },
+                                    error: function () {
+                                        alert("Errore nella richiesta AJAX.");
+                                        cell.data(currentValue).draw();
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        console.error("Errore nel caricamento dei dati:", response.message || 'Dati non validi');
+                    }
+                },
+                error: function () {
+                    console.log("Errore nella richiesta AJAX.");
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            // Funzione per l'inserimento di una nuova categoria
+            $('#saveCategoryBtn').click(function () {
+                var nome = $('#nome').val();
+                var descrizione = $('#descrizione').val();
+
+                $.ajax({
+                    url: '/Home/InsertCategory',
+                    type: 'GET',
+                    data: {
+                        nome: nome,
+                        descrizione: descrizione,
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Categoria inserita con successo');
+                            window.location.reload();
+                        } else {
+                            alert('Errore nell\'inserimento della categoria');
+                        }
+                    },
+                    error: function () {
+                        alert('Errore nella richiesta AJAX');
+                    }   
+                });
+            });
+        });
+
+        $('#openAddCategoryModalBtn').click(function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
+            myModal.show();
+        });
+
+        function formatDate(dateString) {
+            var date = new Date(dateString);
+            return date.toLocaleString();
+        }
+    });
+</script>

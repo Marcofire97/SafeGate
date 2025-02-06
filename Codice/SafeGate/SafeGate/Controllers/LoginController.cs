@@ -29,9 +29,9 @@ namespace SafeGate.Controllers
                     return Json(new { success = false, message = "Username e password sono richiesti" });
                 }
 
-                if (_database.ValidazioneFunzionario(username, HashPassword(password)))
+                if (_database.ValidazioneFunzionario(username, password))
                 {
-                    Funzionario funzionario = _database.Login(username, HashPassword(password));
+                    Funzionario funzionario = _database.Login(username, password);
 
                     if (funzionario == null)
                     {
@@ -55,15 +55,6 @@ namespace SafeGate.Controllers
             {
                 return Json(new { success = false, message = "Si è verificato un errore: " + ex.Message });
             }
-        }
-
-
-        private string HashPassword(string password)
-        {
-            using var sha256 = SHA256.Create();
-            var bytes = Encoding.UTF8.GetBytes(password);
-            var hash = sha256.ComputeHash(bytes);
-            return Convert.ToBase64String(hash);
         }
     }
 }

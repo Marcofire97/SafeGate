@@ -10,5 +10,6 @@
         public string Password { get; set; } = string.Empty;
         public string Ruolo { get; set; } = string.Empty;
         public int Id_Funzionario { get; set; }
+        public int Numero_Contestazioni { get; set; }
     }
 }

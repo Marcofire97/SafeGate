@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SafeGate.Models;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.IO;
 
 namespace SafeGate.Controllers
@@ -64,5 +65,115 @@ namespace SafeGate.Controllers
                 Numero_Punti_Controllo = stats.numero_Punti_Controllo
             });
         }
+
+        public JsonResult GetCheckPoints()
+        {
+            Database db = new Database();
+            return Json(new { success = true, data = db.GetCheckPoints() });
+        }
+
+        public JsonResult InsertCheckPoint(string nome, string descrizione, string tipo)
+        {
+            Database db = new Database();
+            int id = db.InsertCheckPoint(nome, descrizione, tipo);
+            return Json(new { success = true, id = id});
+        }
+
+        [HttpPost]
+        public JsonResult UpdateCheckPoint(int id, string campo, string nuovovalore)
+        {
+            Database db = new Database();
+            bool success = db.UpdateCheckPoint(id, campo, nuovovalore);
+            return Json(new { success = success });
+        }
+
+        public JsonResult DeleteCheckPoint(int id)
+        {
+            Database db = new Database();
+            bool success = db.DeleteCheckPoint(id);
+            return Json(new { success = success });
+        }
+
+        public JsonResult GetOfficers()
+        {
+            Database db = new Database();
+            return Json(new { success = true, data = db.GetOfficers() });
+        }
+
+        public JsonResult InsertOfficer(string nome, string cognome, string username, string password, string ruolo)
+        {
+            Database db = new Database();
+            int id = db.InsertOfficer(nome, cognome, username, password, ruolo);
+            return Json(new { success = true, id = id });
+        }
+
+        [HttpPost]
+        public JsonResult UpdateOfficer(int id, string campo, string nuovovalore)
+        {
+            Database db = new Database();
+            bool success = db.UpdateOfficer(id, campo, nuovovalore);
+            return Json(new { success = success });
+        }
+
+        public JsonResult DeleteOfficer(int id)
+        {
+            Database db = new Database();
+            bool success = db.DeleteOfficer(id);
+            return Json(new { success = success });
+        }
+
+        public JsonResult GetAttendants()
+        {
+            Database db = new Database();
+            var attendants = db.GetAttendants();
+            return Json(new { success = true, data = attendants });
+        }
+
+
+        public JsonResult InsertAttendant(string nome, string cognome, string username, string password, string ruolo, int idFunzionario)
+        {
+            Database db = new Database();
+            int id = db.InsertAttendant(nome, cognome, username, password, ruolo, idFunzionario);
+            return Json(new { success = true, id = id });
+        }
+
+        [HttpPost]
+        public JsonResult UpdateAttendant(int id, string campo, string nuovovalore)
+        {
+            Database db = new Database();
+            bool success = db.UpdateAttendant(id, campo, nuovovalore);
+            return Json(new { success = success });
+        }
+
+
+        public JsonResult DeleteAttendant(int id)
+        {
+            Database db = new Database();
+            bool success = db.DeleteAttendant(id);
+            return Json(new { success = success });
+        }
+
+        public JsonResult GetCategories()
+        {
+            Database db = new Database();
+            var categories = db.GetCategories();
+            return Json(new { success = true, data = categories });
+        }
+
+        public JsonResult InsertCategory(string nome, string descrizione)
+        {
+            Database db = new Database();
+            int id = db.InsertCategory(nome, descrizione);
+            return Json(new { success = true, id = id });
+        }
+
+        [HttpPost]
+        public JsonResult UpdateCategory(int id, string campo, string nuovovalore)
+        {
+            Database db = new Database();
+            bool success = db.UpdateCategory(id, campo, nuovovalore);
+            return Json(new { success = success });
+        }
+
     }
 }

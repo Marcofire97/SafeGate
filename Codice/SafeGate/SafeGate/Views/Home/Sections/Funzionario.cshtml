@@ -1,0 +1,288 @@
+﻿<h2 class="text-center mb-4">Elenco Funzionari</h2>
+
+<!-- Pulsante per aggiungere un nuovo funzionario -->
+<div class="text-center mb-4">
+    <button class="btn btn-primary" id="openAddOfficerModalBtn">Aggiungi Funzionario</button>
+</div>
+
+<!-- Tabella dei Funzionario -->
+<table id="OfficerTable" class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Cognome</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Ruolo</th>
+            <th>Data Login</th>
+            <th>In Servizio</th>
+            <th>Azioni</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- Modal per aggiungere un nuovo funzionario -->
+<div class="modal fade" id="addOfficerModal" tabindex="-1" role="dialog" aria-labelledby="addOfficerModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addOfficerModalLabel">Aggiungi Funzionario</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addOfficerForm">
+                    <div class="form-group">
+                        <label for="nome">Nome</label>
+                        <input type="text" class="form-control" id="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cognome">Cognome</label>
+                        <input type="text" class="form-control" id="cognome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" class="form-control" id="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="text" class="form-control" id="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ruolo">Ruolo</label>
+                        <input type="text" class="form-control" id="ruolo" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                <button type="button" class="btn btn-primary" id="saveOfficerBtn">Salva</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-backdrop {
+        display: contents !important;
+    }
+
+    .modal {
+        overflow-y: visible;
+        overflow: visible;
+    }
+
+    .modal-dialog {
+        max-width: none;
+        margin: auto;
+        overflow-y: visible;
+        overflow: visible;
+    }
+
+    .modal-body {
+        max-height: none;
+        overflow-y: visible;
+        overflow: visible;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        // Funzione per caricare il DataTable
+        function loadDataTableScript(callback) {
+            var script = document.createElement('script');
+            script.src = "https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js";
+            script.onload = callback;
+            document.head.appendChild(script);
+        }
+
+        // Carica DataTables e inizializza la tabella
+        var dataTable;
+        loadDataTableScript(function() {
+            $.ajax({
+                url: "/Home/GetOfficers",
+                type: "GET",
+                dataType: "json",
+                success: function (response) {
+                    if (response.success && response.data && Array.isArray(response.data) && response.data.length > 0) {
+                        console.log("Dati ricevuti:", response.data);
+
+                        dataTable = $('#OfficerTable').DataTable({
+                            "paging": true,
+                            "searching": true,
+                            "info": true,
+                            "ordering": true,
+                            "data": response.data,
+                            "columns": [
+                                { "data": "id_Funzionario" },
+                                { "data": "nome" },
+                                { "data": "cognome" },
+                                { "data": "username" },
+                                { "data": "password" },
+                                { "data": "ruolo" },
+                                {
+                                    "data": "data_Ora_Login",
+                                    "render": function(data, type, row) {
+                                        return formatDate(data);
+                                    }
+                                },
+                                {
+                                    "data": "in_Servizio",
+                                    "render": function(data, type, row) {
+                                        return data ? data : "NO";
+                                    }
+                                },
+                                {
+                                    "data": "id_Funzionario",
+                                    "render": function(data, type, row) {
+                                        return '<button class="btn btn-danger btn-sm delete-btn" data-id="' + data + '">🗑️</button>';
+                                    }
+                                }
+                            ],
+                        });
+
+                        // Gestione delle celle per modificare i valori
+                        $('#OfficerTable').on('click', 'td', function () {
+                            var cell = dataTable.cell(this);
+                            var columnIndex = cell.index().column;
+
+                            if (columnIndex === 0 || columnIndex === 6 || columnIndex === 7 || columnIndex === 8) {
+                                return;
+                            }
+
+                            var currentValue = cell.data();
+                            var newValue = prompt("Modifica il valore:", currentValue);
+
+                            if (newValue !== null && newValue !== currentValue) {
+                                cell.data(newValue).draw();
+
+                                var rowData = dataTable.row(cell.index().row).data();
+                                var updatedField = columnIndex === 1 ? 'Nome' :
+                                                   columnIndex === 2 ? 'Cognome' :
+                                                   columnIndex === 3 ? 'Username' :
+                                                   columnIndex === 4 ? 'Password' :
+                                                   columnIndex === 5 ? 'Ruolo' : '';
+
+                                // Aggiornamento del funzionario
+                                $.ajax({
+                                    url: "/Home/UpdateOfficer",
+                                    type: "POST",
+                                    data: {
+                                        id: rowData.id_Funzionario,
+                                        campo: updatedField,
+                                        nuovovalore: newValue
+                                    },
+                                    success: function (response) {
+                                        if (response.success) {
+                                            alert("Funzionario aggiornato con successo.");
+                                        } else {
+                                            alert("Errore durante l'aggiornamento del funzionario.");
+                                            cell.data(currentValue).draw();
+                                        }
+                                    },
+                                    error: function () {
+                                        alert("Errore nella richiesta AJAX.");
+                                        cell.data(currentValue).draw();
+                                    }
+                                });
+                            }
+                        });
+
+                        // Gestione del click sul pulsante di eliminazione
+                        $('#OfficerTable').on('click', '.delete-btn', function() {
+                            var officerId = $(this).data('id');
+                            var confirmation = confirm("Sei sicuro di voler eliminare questo funzionario?");
+                            if (confirmation) {
+                                $.ajax({
+                                    url: "/Home/DeleteOfficer",
+                                    type: "POST",
+                                    data: { id: officerId },
+                                    success: function(response) {
+                                        if (response.success) {
+                                            alert("Funzionario eliminato con successo!");
+                                            window.location.href = '/Home/Index';
+                                        } else {
+                                            alert("Errore durante l'eliminazione del funzionario.");
+                                        }
+                                    },
+                                    error: function() {
+                                        alert("Errore nella richiesta AJAX.");
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        console.error("Errore nel caricamento dei dati:", response.message || 'Dati non validi');
+                    }
+                },
+                error: function () {
+                    console.log("Errore nella richiesta AJAX.");
+                }
+            });
+        });
+
+        // Gestione dell'inserimento di un nuovo funzionario
+        $('#saveOfficerBtn').click(function() {
+            var nome = $('#nome').val();
+            var cognome = $('#cognome').val();
+            var username = $('#username').val();
+            var password = $('#password').val();
+            var ruolo = $('#ruolo').val();
+
+            if (nome && cognome && username && password && ruolo) {
+                $.ajax({
+                    url: "/Home/InsertOfficer",
+                    type: "POST",
+                    data: {
+                        nome: nome,
+                        cognome: cognome,
+                        username: username,
+                        password: password,
+                        ruolo: ruolo
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            var newOfficer = {
+                                id_Funzionario: response.id,
+                                nome: nome,
+                                cognome: cognome,
+                                username: username,
+                                password: password,
+                                ruolo: ruolo
+                            };
+
+                            dataTable.row.add(newOfficer).draw();
+                            alert("Funzionario aggiunto con successo!");
+                            window.location.href = '/Home/Index';
+                        } else {
+                            alert("Errore durante l'aggiunta del funzionario.");
+                        }
+                    },
+                    error: function() {
+                        alert("Errore nella richiesta AJAX.");
+                    }
+                });
+            } else {
+                alert("Per favore, completa tutti i campi.");
+            }
+        });
+
+        $('#openAddOfficerModalBtn').click(function () {
+            var myModal = new bootstrap.Modal(document.getElementById('addOfficerModal'));
+            myModal.show();
+        });
+
+        function formatDate(dateString) {
+            var date = new Date(dateString);
+            return date.toLocaleString();
+        }
+
+    });
+</script>

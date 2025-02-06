@@ -5,5 +5,6 @@
         public int Id_Categoria { get; set; }
         public string Nome { get; set; } = string.Empty;
         public string Descrizione { get; set; } = string.Empty;
+        public string Merci_Respinte { get; set; } = string.Empty;
     }
 }
